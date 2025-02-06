@@ -12,10 +12,12 @@ namespace UserApi.Services
     public class CardDetailService : ICardDetailService
     {
         private readonly ApiDbContext _context;
+        private readonly ICardDetailRepository _cardDetailRepository;
 
-        public CardDetailService(ApiDbContext context)
+        public CardDetailService(ApiDbContext context , ICardDetailRepository cardDetailRepository)
         {
             _context = context;
+            _cardDetailRepository = cardDetailRepository;
         }
 
         public async Task<ServiceResponse<CardDetailDTO>> AddCardAsync(string userId, CardDetailDTO cardDetailDto)

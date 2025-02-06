@@ -84,6 +84,22 @@ namespace UserApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Otps",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Otps", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -190,32 +206,45 @@ namespace UserApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CardDetails",
+                name: "Contacts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CardNumber = table.Column<string>(type: "nvarchar(16)", nullable: false),
-                    ExpirationDate = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    CVV2 = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BankId = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(16)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(11)", nullable: false),
+                    Mail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    DestinationCardNumber = table.Column<string>(type: "nvarchar(16)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CardDetails", x => x.Id);
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CardDetails_AspNetUsers_UserId",
+                        name: "FK_Contacts_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallets",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CardDetails_Banks_BankId",
-                        column: x => x.BankId,
-                        principalTable: "Banks",
+                        name: "FK_Wallets_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -237,6 +266,41 @@ namespace UserApi.Migrations
                         principalTable: "Banks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CardDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CardNumber = table.Column<string>(type: "nvarchar(16)", nullable: false),
+                    ExpirationDate = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    CVV2 = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BankId = table.Column<int>(type: "int", nullable: false),
+                    ContactId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CardDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CardDetails_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CardDetails_Banks_BankId",
+                        column: x => x.BankId,
+                        principalTable: "Banks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CardDetails_Contacts_ContactId",
+                        column: x => x.ContactId,
+                        principalTable: "Contacts",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -322,6 +386,11 @@ namespace UserApi.Migrations
                 column: "BankId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CardDetails_ContactId",
+                table: "CardDetails",
+                column: "ContactId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CardDetails_UserId",
                 table: "CardDetails",
                 column: "UserId");
@@ -335,6 +404,23 @@ namespace UserApi.Migrations
                 name: "IX_CardPrefixes_Prefix",
                 table: "CardPrefixes",
                 column: "Prefix",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contacts_UserId",
+                table: "Contacts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Otps_PhoneNumber_Code",
+                table: "Otps",
+                columns: new[] { "PhoneNumber", "Code" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wallets_UserId",
+                table: "Wallets",
+                column: "UserId",
                 unique: true);
         }
 
@@ -366,13 +452,22 @@ namespace UserApi.Migrations
                 name: "Fees");
 
             migrationBuilder.DropTable(
+                name: "Otps");
+
+            migrationBuilder.DropTable(
+                name: "Wallets");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Contacts");
 
             migrationBuilder.DropTable(
                 name: "Banks");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }
