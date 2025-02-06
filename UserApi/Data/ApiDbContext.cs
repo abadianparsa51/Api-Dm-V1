@@ -8,7 +8,7 @@ namespace UserApi.Data
     {
 
         public DbSet<CardDetail> CardDetails { get; set; }
-
+        public DbSet<Otp> Otps { get; set; }
         public DbSet<CardPrefix> CardPrefixes { get; set; }
         public DbSet<Bank> Banks { get; set; }
         //public DbSet<TransactionLog> TransactionLogs { get; set; } // درست کردن نام DbSet
@@ -27,7 +27,9 @@ namespace UserApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<Otp>()
+            .HasIndex(o => new { o.PhoneNumber, o.Code })
+            .IsUnique(); // جلوگیری از ایجاد OTPهای تکراری
             // User ↔ CardDetail (One-to-Many)
             modelBuilder.Entity<CardDetail>()
                 .HasOne(c => c.User)

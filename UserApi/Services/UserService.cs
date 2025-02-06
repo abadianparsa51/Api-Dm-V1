@@ -22,14 +22,20 @@ namespace UserApi.Services
             if (existingUser != null)
                 return new AuthResult { Result = false, Errors = new List<string> { "Email already exists." } };
 
-            var newUser = new ApplicationUser { Email = userDto.Email, UserName = userDto.Email };
+            var newUser = new ApplicationUser
+            {
+                Email = userDto.Email,
+                UserName = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber  // اضافه کردن شماره تلفن
+            };
+
             var isCreated = await _userRepository.CreateUserAsync(newUser, userDto.Password);
 
             if (!isCreated)
                 return new AuthResult { Result = false, Errors = new List<string> { "Failed to register user." } };
 
             var token = _jwtHelper.GenerateJwtToken(newUser);
-            return new AuthResult { Token = token, Email = userDto.Email, Result = true};
+            return new AuthResult { Token = token, Email = userDto.Email, PhoneNumber = userDto.PhoneNumber, Result = true }; // ارسال شماره تلفن در پاسخ
         }
 
         public async Task<AuthResult> LoginUserAsync(UserLoginRequestDto loginDto)
@@ -39,7 +45,17 @@ namespace UserApi.Services
                 return new AuthResult { Result = false, Errors = new List<string> { "Invalid credentials." } };
 
             var token = _jwtHelper.GenerateJwtToken(user);
-            return new AuthResult { Token = token, Email = user.Email, Result = true};
+            return new AuthResult { Token = token, Email = user.Email, PhoneNumber = user.PhoneNumber, Result = true }; // ارسال شماره تلفن در پاسخ
+        }
+        public async Task<ApplicationUser> GetUserByPhoneNumberAsync(string phoneNumber)
+        {
+            return await _userRepository.GetUserByPhoneNumberAsync(phoneNumber);
+        }
+
+        public string GenerateJwtToken(ApplicationUser user)
+        {
+            // Use IJwtHelper to generate the JWT token
+            return _jwtHelper.GenerateJwtToken(user);
         }
     }
 }

@@ -12,7 +12,7 @@ using UserApi.Data;
 namespace UserApi.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250201091921_InitialCreate")]
+    [Migration("20250208094731_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -504,6 +504,36 @@ namespace UserApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Fees");
+                });
+
+            modelBuilder.Entity("UserApi.Core.Models.Otp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ExpiryTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber", "Code")
+                        .IsUnique();
+
+                    b.ToTable("Otps");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
