@@ -1,0 +1,44 @@
+﻿using Microsoft.EntityFrameworkCore;
+using UserApi.Core.Interfaces;
+using UserApi.Data.Repositories;
+using UserApi.Helpers;
+using UserApi.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using UserApi.Core.Models;
+using UserApi.Data;
+using UserApi.Core.Services;
+
+namespace UserApi.Configuration
+{
+    public static class ServiceRegistration
+    {
+        public static void AddCoreServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Database Context
+            services.AddDbContext<ApiDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DevConnection")));
+
+            // Identity Configuration
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApiDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Dependency Injection for Repositories and Services
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
+            // Register services and repositories with DI container
+            services.AddScoped<ICardRepository, CardRepository>();
+            services.AddScoped<ICardService, CardService>();
+            // Register services and repositories with DI container
+            services.AddScoped<ICardDetailRepository, CardDetailRepository>();
+            services.AddScoped<ICardDetailService, CardDetailService>();
+
+            services.AddSingleton<IJwtHelper, JwtHelper>();
+
+            // Bind JwtConfig to appsettings.json section
+            services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtConfig>>().Value);
+        }
+    }
+}
