@@ -7,5 +7,8 @@ namespace UserApi.Core.Interfaces
     {
         Task<AuthResult> RegisterUserAsync(UserRegistrationRequestDto userDto);
         Task<AuthResult> LoginUserAsync(UserLoginRequestDto loginDto);
+        // Add these two methods
+        Task<ApplicationUser> GetUserByPhoneNumberAsync(string phoneNumber);
+        string GenerateJwtToken(ApplicationUser user);  // Update to accept ApplicationUser
     }
 }

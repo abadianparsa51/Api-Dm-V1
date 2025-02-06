@@ -1,11 +1,15 @@
-﻿namespace UserApi.Core.Models.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UserApi.Core.Models.DTOs
 {
     public class CardDetailDTO
     {
-        public int Id { get; set; }
 
+        [Required]
         public string CardNumber { get; set; }
+        [Required]
         public string ExpirationDate { get; set; }
+        [Required]
         public string CVV2 { get; set; }
 
     }
