@@ -8,6 +8,8 @@ using Microsoft.Extensions.Options;
 using UserApi.Core.Models;
 using UserApi.Data;
 using UserApi.Core.Services;
+using UserApi.Core.Repositories;
+using UserApi.Helper;
 
 namespace UserApi.Configuration
 {
@@ -33,9 +35,13 @@ namespace UserApi.Configuration
             // Register services and repositories with DI container
             services.AddScoped<ICardDetailRepository, CardDetailRepository>();
             services.AddScoped<ICardDetailService, CardDetailService>();
-
+            services.AddScoped<IContactRepository, ContactRepository>();
+            services.AddScoped<IContactService, ContactService>();
+            services.AddScoped<OtpRepository>();
+            services.AddScoped<IOtpService, OtpService>();
             services.AddSingleton<IJwtHelper, JwtHelper>();
-
+            services.AddAutoMapper(typeof(ContactProfile));
+            services.AddSignalR(); // اضافه کردن SignalR
             // Bind JwtConfig to appsettings.json section
             services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtConfig>>().Value);

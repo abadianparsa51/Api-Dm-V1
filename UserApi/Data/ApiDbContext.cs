@@ -8,13 +8,13 @@ namespace UserApi.Data
     {
 
         public DbSet<CardDetail> CardDetails { get; set; }
-
+        public DbSet<Otp> Otps { get; set; }
         public DbSet<CardPrefix> CardPrefixes { get; set; }
         public DbSet<Bank> Banks { get; set; }
         //public DbSet<TransactionLog> TransactionLogs { get; set; } // درست کردن نام DbSet
         public DbSet<Fee> Fees { get; set; }
 
-        //public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
         //public DbSet<JobRequest> JobRequests { get; set; }
         //public DbSet<NotificationRequest> NotificationRequests { get; set; }
 
@@ -27,7 +27,9 @@ namespace UserApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<Otp>()
+            .HasIndex(o => new { o.PhoneNumber, o.Code })
+            .IsUnique(); // جلوگیری از ایجاد OTPهای تکراری
             // User ↔ CardDetail (One-to-Many)
             modelBuilder.Entity<CardDetail>()
                 .HasOne(c => c.User)
@@ -47,7 +49,20 @@ namespace UserApi.Data
                 .HasOne(p => p.Bank)
                 .WithMany(b => b.CardPrefixes)
                 .HasForeignKey(p => p.BankId);
+            // ارتباط User ↔ Contact (One-to-Many)
+            modelBuilder.Entity<Contact>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Contacts)
+                .HasForeignKey(c => c.UserId)
+                .IsRequired();
 
+            // اصلاح رابطه Contact ↔ CardDetail (One-to-Many)
+            //modelBuilder.Entity<CardDetail>()
+            //    .HasOne(cd => cd.Contact)
+            //    .WithMany(c => c.Cards)
+            //    .HasForeignKey(cd => cd.ContactId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Restrict);
             // Prevent cascade delete
             // افزودن داده‌های پیش‌شماره کارت‌های بانکی
             // مشخص کردن داده‌های اولیه برای جدول Bank

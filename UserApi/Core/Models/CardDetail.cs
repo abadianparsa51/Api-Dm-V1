@@ -33,7 +33,7 @@ namespace UserApi.Core.Models
         [NotMapped]
         public string BankName { get; set; }
 
-        //// Foreign key برای Contact
+        ////// Foreign key برای Contact
         //public int ContactId { get; set; }
 
         //// ویژگی ناوبری برای Contact

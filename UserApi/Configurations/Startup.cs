@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UserApi.Configuration;
+using UserApi.Helper;
 
 namespace UserApi
 {
@@ -48,7 +49,7 @@ namespace UserApi
 
             // Enable Hangfire Dashboard
             app.UseHangfireDashboard("/hangfire");
-
+           
             // Middleware Pipeline
             app.UseRouting();
             app.UseAuthentication();
@@ -57,6 +58,7 @@ namespace UserApi
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<NotificationHub>("/notificationHub");
                 endpoints.MapControllers();
             });
         }
