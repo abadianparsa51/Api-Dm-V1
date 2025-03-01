@@ -1,57 +1,41 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UserApi.Core.Interfaces;
 using UserApi.Core.Models;
+using UserApi.Data;
+using System.Threading.Tasks;
 
-namespace UserApi.Data.Repositories
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly ApiDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public UserRepository(ApiDbContext context, UserManager<ApplicationUser> userManager)
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApiDbContext _context;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public UserRepository(UserManager<ApplicationUser> userManager, ApiDbContext context)
-        {
-            _userManager = userManager;
-            _context = context;
-        }
-        public async Task<ApplicationUser> GetUserByIdAsync(string userId)
-        {
-            return await _userManager.Users.SingleOrDefaultAsync(u => u.Id == userId);
-        }
+    public async Task<ApplicationUser> GetUserByEmailAsync(string email)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
 
-        public async Task<ApplicationUser> GetUserByEmailAsync(string email)
-        {
-            return await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
+    public async Task<ApplicationUser> GetUserByPhoneAsync(string phoneNumber)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+    }
 
-        public async Task<ApplicationUser> GetUserByPhoneNumberAsync(string phoneNumber)
-        {
-            return await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
-        }
+    public async Task<bool> CreateUserAsync(ApplicationUser user, string password)
+    {
+        // استفاده از UserManager برای ایجاد کاربر با رمز عبور هش شده
+        var result = await _userManager.CreateAsync(user, password);
 
-        public async Task<bool> CreateUserAsync(ApplicationUser user, string password)
-        {
-            var result = await _userManager.CreateAsync(user, password);
-            return result.Succeeded;
-        }
+        return result.Succeeded;
+    }
 
-        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
-        {
-            return await _userManager.CheckPasswordAsync(user, password);
-        }
-
-        public async Task<Wallet> GetWalletByUserIdAsync(string userId)
-        {
-            return await _context.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
-        }
-        public async Task<bool> CreateWalletAsync(Wallet wallet)
-        {
-            _context.Wallets.Add(wallet);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
-        }
-  
-
+    public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
+    {
+        // بررسی رمز عبور با UserManager
+        return await _userManager.CheckPasswordAsync(user, password);
     }
 }

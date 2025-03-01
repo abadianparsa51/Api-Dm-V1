@@ -30,6 +30,8 @@ namespace UserApi.Configuration
 
             // Dependency Injection for Repositories and Services
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IOtpRepository, OtpRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICardRepository, CardRepository>();
             services.AddScoped<ICardService, CardService>();

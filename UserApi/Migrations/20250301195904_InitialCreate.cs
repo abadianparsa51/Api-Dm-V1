@@ -92,7 +92,8 @@ namespace UserApi.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Code = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,31 +208,6 @@ namespace UserApi.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Contacts",
-<<<<<<<< HEAD:UserApi/Migrations/20250211110503_InitialCreate.cs
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(16)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(11)", nullable: false),
-                    Mail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Contacts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Contacts_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CardDetails",
-========
->>>>>>>> future/Api-Dm-v1/Impliment-CQRS-for-Contact:UserApi/Migrations/20250225140547_InitialCreate.cs
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -441,15 +417,12 @@ namespace UserApi.Migrations
                 table: "Otps",
                 columns: new[] { "PhoneNumber", "Code" },
                 unique: true);
-<<<<<<<< HEAD:UserApi/Migrations/20250211110503_InitialCreate.cs
-========
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wallets_UserId",
                 table: "Wallets",
                 column: "UserId",
                 unique: true);
->>>>>>>> future/Api-Dm-v1/Impliment-CQRS-for-Contact:UserApi/Migrations/20250225140547_InitialCreate.cs
         }
 
         /// <inheritdoc />
@@ -477,23 +450,12 @@ namespace UserApi.Migrations
                 name: "CardPrefixes");
 
             migrationBuilder.DropTable(
-                name: "Contacts");
-
-            migrationBuilder.DropTable(
                 name: "Fees");
 
             migrationBuilder.DropTable(
                 name: "Otps");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:UserApi/Migrations/20250211110503_InitialCreate.cs
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Banks");
-
-            migrationBuilder.DropTable(
-========
                 name: "Wallets");
 
             migrationBuilder.DropTable(
@@ -506,7 +468,6 @@ namespace UserApi.Migrations
                 name: "Banks");
 
             migrationBuilder.DropTable(
->>>>>>>> future/Api-Dm-v1/Impliment-CQRS-for-Contact:UserApi/Migrations/20250225140547_InitialCreate.cs
                 name: "AspNetUsers");
         }
     }

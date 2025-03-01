@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using UserApi.Core.Interfaces;
 using UserApi.Core.Models;
+using UserApi.Data;
 
 namespace UserApi.Data.Repositories
 {
-    public class OtpRepository
+    public class OtpRepository : IOtpRepository
     {
         private readonly ApiDbContext _context;
 
@@ -18,15 +21,17 @@ namespace UserApi.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Otp> GetOtpAsync(string phoneNumber, string otpCode)
+        public async Task<Otp?> GetOtpAsync(string userId, string otp)
         {
-            return await _context.Otps.FirstOrDefaultAsync(o =>
-                o.PhoneNumber == phoneNumber && o.Code == otpCode && !o.IsUsed && o.ExpiryTime > DateTime.UtcNow);
+            return await _context.Otps
+                .Where(o => o.UserId == userId && o.Code == otp && !o.IsUsed && o.ExpiryTime > DateTime.UtcNow)
+                .FirstOrDefaultAsync();
         }
 
         public async Task MarkOtpAsUsedAsync(Otp otp)
         {
             otp.IsUsed = true;
+            _context.Otps.Update(otp);
             await _context.SaveChangesAsync();
         }
     }
