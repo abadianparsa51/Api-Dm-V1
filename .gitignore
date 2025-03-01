@@ -361,3 +361,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/UserApi/Migrations/20250211110503_InitialCreate.cs
+/UserApi/Migrations/20250211110503_InitialCreate.Designer.cs
+/UserApi/Migrations/20250212173213_AddWalletModel.cs
+/UserApi/Migrations/20250212173213_AddWalletModel.Designer.cs
+/UserApi/Migrations/20250225140547_InitialCreate.cs
+/UserApi/Migrations/20250225140547_InitialCreate.Designer.cs
+/UserApi/Migrations/ApiDbContextModelSnapshot.cs
+/UserApi/Migrations/20250225140547_InitialCreate.Designer.cs
+/UserApi/Migrations/ApiDbContextModelSnapshot.cs
+/UserApi/Migrations/20250225140547_InitialCreate.cs
+/UserApi/Migrations/20250212173213_AddWalletModel.Designer.cs
+/UserApi/Migrations/20250212173213_AddWalletModel.cs
+/UserApi/Migrations/20250211110503_InitialCreate.Designer.cs
+/UserApi/Migrations/20250211110503_InitialCreate.cs

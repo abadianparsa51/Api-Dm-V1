@@ -12,8 +12,8 @@ using UserApi.Data;
 namespace UserApi.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250212173213_AddWalletModel")]
-    partial class AddWalletModel
+    [Migration("20250301085855_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace UserApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DestinationCardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<string>("Mail")
                         .IsRequired()
@@ -360,6 +364,9 @@ namespace UserApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<int?>("ContactId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ExpirationDate")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -372,6 +379,8 @@ namespace UserApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BankId");
+
+                    b.HasIndex("ContactId");
 
                     b.HasIndex("UserId");
 
@@ -658,6 +667,10 @@ namespace UserApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Contact", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("ContactId");
+
                     b.HasOne("UserApi.Core.Models.ApplicationUser", "User")
                         .WithMany("Cards")
                         .HasForeignKey("UserId")
@@ -689,6 +702,11 @@ namespace UserApi.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Contact", b =>
+                {
+                    b.Navigation("Cards");
                 });
 
             modelBuilder.Entity("UserApi.Core.Models.ApplicationUser", b =>
