@@ -1,13 +1,11 @@
-﻿using UserApi.Services;
+﻿// IContactService.cs
+using System.Threading.Tasks;
+using UserApi.Services;
 
-namespace UserApi.Core.Interfaces
+public interface IContactService
 {
-    public interface IContactService
-    {
-        Task<ServiceResponse<ContactDTO>> AddContactAsync(string userId, ContactDTO contactDto);
-        Task<ServiceResponse<ContactDTO>> GetContactByIdAsync(string userId, int id);
-        Task<ServiceResponse<IEnumerable<ContactDTO>>> GetUserContactsAsync(string userId);
-        Task<ServiceResponse<ContactDTO>> UpdateContactAsync(string userId, int id, ContactDTO updatedContactDto);
-        Task<ServiceResponse<bool>> DeleteContactAsync(string userId, int id);
-    }
+    Task<ServiceResponse<ContactDto>> AddContact(AddContactCommand command, string userId);
+    Task<ServiceResponse<ContactDto>> UpdateContact(UpdateContactCommand command);
+    Task<ServiceResponse<bool>> DeleteContact(DeleteContactCommand command);
+    Task<List<ContactDto>> GetAllContacts();  // New method for getting all contacts
 }

@@ -27,16 +27,9 @@ namespace UserApi.Core.Models
         public int BankId { get; set; }
         public Bank Bank { get; set; }
 
-        // ارتباط یک به چند با تراکنش‌ها
-        //public ICollection<TransactionLog> TransactionLogs { get; set; }  // یک کارت می‌تواند چند تراکنش داشته باشد
-
         [NotMapped]
         public string BankName { get; set; }
 
-        ////// Foreign key برای Contact
-        //public int ContactId { get; set; }
 
-        //// ویژگی ناوبری برای Contact
-        //public Contact Contact { get; set; }
     }
 }

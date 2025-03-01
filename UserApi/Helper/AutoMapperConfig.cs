@@ -7,7 +7,7 @@ namespace UserApi.Helper
     {
         public ContactProfile()
         {
-            CreateMap<Contact, ContactDTO>().ReverseMap();
+            CreateMap<Contact, ContactDto>().ReverseMap();
         }
     }
 }

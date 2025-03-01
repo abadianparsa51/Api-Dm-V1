@@ -16,13 +16,13 @@ public class Contact
 
     [MaxLength(100)]
     public string Mail { get; set; } = "";
-    //[Column(TypeName = "nvarchar(16)")]
-    //public string DestinationCardNumber { get; set; } = "";
+    [Column(TypeName = "nvarchar(16)")]
+    public string DestinationCardNumber { get; set; } = "";
 
     public string UserId { get; set; } // کلید خارجی به ApplicationUser
     public ApplicationUser User { get; set; } // Navigation Property
 
-    //public ICollection<CardDetail> Cards { get; set; } // ارتباط یک Contact با چند Card
+    public ICollection<CardDetail> Cards { get; set; } // ارتباط یک Contact با چند Card
 
     // Navigation Property برای TransactionLogs
     //public ICollection<TransactionLog> TransactionLogs { get; set; } // ارتباط یک Contact با چند تراکنش

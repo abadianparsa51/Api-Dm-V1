@@ -1,85 +1,63 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using UserApi.Services;
 using UserApi.Core.Interfaces;
 using UserApi.Core.Models;
-using UserApi.Core.Services;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
-namespace UserApi.Controllers
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Add authorization
+[Route("api/[controller]")]
+[ApiController]
+
+public class ContactController : ControllerBase
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ContactController : ControllerBase
+    private readonly IContactService _contactService;
+
+    public ContactController(IContactService contactService)
     {
-        private readonly IContactService _contactService;
+        _contactService = contactService;
+    }
 
-        public ContactController(IContactService contactService)
-        {
-            _contactService = contactService;
-        }
+    // Endpoint for adding a new contact
 
-        private string GetUserId()
-        {
-            // Assuming you have some form of user authentication like JWT
-            return User.FindFirstValue(ClaimTypes.NameIdentifier); // or another method of extracting the user ID
-        }
+    [HttpPost]
+    public async Task<IActionResult> AddContact([FromBody] AddContactCommand command)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return BadRequest("User ID not found in token.");
 
-        [HttpPost]
-        public async Task<ActionResult<ContactDTO>> AddContact([FromBody] ContactDTO contactDto)
-        {
-            var userId = GetUserId();
-            var contact = await _contactService.AddContactAsync(userId, contactDto);
-            return CreatedAtAction(nameof(GetContactById), new { id = contact.Data.Id }, contact.Data);
-        }
+        // اضافه کردن userId به دستور
+        var response = await _contactService.AddContact(command, userId);
+        if (response.Success)
+            return Ok(new { message = response.Message, cardDetails = response.Data });
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ContactDTO>> GetContactById(int id)
-        {
-            var userId = GetUserId();
-            var contact = await _contactService.GetContactByIdAsync(userId, id);
-            if (contact.Data == null)
-            {
-                return NotFound();
-            }
+        return BadRequest(response.Message);
+    }
 
-            return Ok(contact.Data);
-        }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ContactDTO>>> GetAllContacts()
-        {
-            var userId = GetUserId();
-            var contacts = await _contactService.GetUserContactsAsync(userId);
-            return Ok(contacts.Data);
-        }
+    [HttpPut]
+    public async Task<IActionResult> UpdateContact(UpdateContactCommand command)
+    {
+        var response = await _contactService.UpdateContact(command);
+        return response.Success ? Ok(response) : BadRequest(response.Message);
+    }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ContactDTO>> UpdateContact(int id, [FromBody] ContactDTO contactDto)
-        {
-            var userId = GetUserId();
-            contactDto.Id = id;
-            var updatedContact = await _contactService.UpdateContactAsync(userId, id, contactDto);
-            if (updatedContact.Data == null)
-            {
-                return NotFound();
-            }
+    [HttpDelete]
+    public async Task<IActionResult> DeleteContact(DeleteContactCommand command)
+    {
+        var response = await _contactService.DeleteContact(command);
+        return response.Success ? Ok(response) : BadRequest(response.Message);
+    }
 
-            return Ok(updatedContact.Data);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteContact(int id)
-        {
-            var userId = GetUserId();
-            var success = await _contactService.DeleteContactAsync(userId, id);
-            if (!success.Data)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
-        }
+    // Add GetAllContacts to return all contacts
+    [HttpGet]
+    public async Task<IActionResult> GetAllContacts()
+    {
+        var contacts = await _contactService.GetAllContacts();
+        return Ok(contacts);
     }
 }

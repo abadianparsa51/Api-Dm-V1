@@ -31,7 +31,7 @@ namespace UserApi
 
             // Configure Hangfire
             services.AddHangfireConfiguration(Configuration);
-
+            services.AddHttpContextAccessor();
             // Add CORS Configuration
             services.AddCorsConfiguration();
 

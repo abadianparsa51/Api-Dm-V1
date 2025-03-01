@@ -56,17 +56,6 @@ namespace UserApi.Data
                 .WithMany(u => u.Contacts)
                 .HasForeignKey(c => c.UserId)
                 .IsRequired();
-
-            // اصلاح رابطه Contact ↔ CardDetail (One-to-Many)
-            //modelBuilder.Entity<CardDetail>()
-            //    .HasOne(cd => cd.Contact)
-            //    .WithMany(c => c.Cards)
-            //    .HasForeignKey(cd => cd.ContactId)
-            //    .IsRequired()
-            //    .OnDelete(DeleteBehavior.Restrict);
-            // Prevent cascade delete
-            // افزودن داده‌های پیش‌شماره کارت‌های بانکی
-            // مشخص کردن داده‌های اولیه برای جدول Bank
             modelBuilder.Entity<Bank>().HasData(
                  new Bank { Id = 1, Name = "بانک ملی ایران", SwiftCode = "BKAB12" },
                  new Bank { Id = 2, Name = "بانک سپه", SwiftCode = "BKB123" },

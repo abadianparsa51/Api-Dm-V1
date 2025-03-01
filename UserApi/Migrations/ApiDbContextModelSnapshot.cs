@@ -30,6 +30,13 @@ namespace UserApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+<<<<<<< HEAD
+=======
+                    b.Property<string>("DestinationCardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(16)");
+
+>>>>>>> future/Api-Dm-v1/Impliment-CQRS-for-Contact
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -357,6 +364,9 @@ namespace UserApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<int?>("ContactId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ExpirationDate")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -369,6 +379,8 @@ namespace UserApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BankId");
+
+                    b.HasIndex("ContactId");
 
                     b.HasIndex("UserId");
 
@@ -655,6 +667,10 @@ namespace UserApi.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Contact", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("ContactId");
+
                     b.HasOne("UserApi.Core.Models.ApplicationUser", "User")
                         .WithMany("Cards")
                         .HasForeignKey("UserId")
@@ -688,6 +704,14 @@ namespace UserApi.Migrations
                     b.Navigation("User");
                 });
 
+<<<<<<< HEAD
+=======
+            modelBuilder.Entity("Contact", b =>
+                {
+                    b.Navigation("Cards");
+                });
+
+>>>>>>> future/Api-Dm-v1/Impliment-CQRS-for-Contact
             modelBuilder.Entity("UserApi.Core.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Cards");
