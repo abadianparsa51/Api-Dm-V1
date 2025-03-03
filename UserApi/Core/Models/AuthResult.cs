@@ -10,6 +10,7 @@
         public string WalletId { get; set; } // New field for wallet ID
         public decimal WalletBalance { get; set; } // New field for wallet balance
         public List<string>? Errors { get; set; }
-
+        public bool Success { get; internal set; }
+        public string Message { get; internal set; }
     }
 }

@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using UserApi.Core.Models;
 using UserApi.Data;
-using UserApi.Core.Services;
 using UserApi.Core.Repositories;
 using UserApi.Helper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using UserApi.Repositories;
 
 namespace UserApi.Configuration
 {
@@ -30,11 +30,15 @@ namespace UserApi.Configuration
 
             // Dependency Injection for Repositories and Services
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IOtpRepository, OtpRepository>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICardRepository, CardRepository>();
-            services.AddScoped<ICardService, CardService>();
-            services.AddScoped<ICardDetailRepository, CardDetailRepository>();
-            services.AddScoped<ICardDetailService, CardDetailService>();
+
+            services.AddScoped<ICardManagementService, CardManagementService>();
+            services.AddScoped<ICardManagementRepository, CardManagementRepository>();
+            //services.AddScoped<ICardDetailService, CardDetailService>();
+            //services.AddScoped<ICardRepository, CardRepository>();
+            //services.AddScoped<ICardService, CardService>();
             services.AddScoped<IContactRepository, ContactRepository>();
             services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IContactCommandRepository, ContactCommandRepository>();

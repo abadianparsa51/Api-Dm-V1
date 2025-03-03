@@ -7,5 +7,6 @@
         public string Code { get; set; }
         public DateTime ExpiryTime { get; set; }
         public bool IsUsed { get; set; }
+        public string UserId { get; internal set; }
     }
 }

@@ -13,18 +13,13 @@ namespace UserApi.Controllers
     [Route("api/[controller]")]
     public class CardDetailController : ControllerBase
     {
-        private readonly ICardDetailService _cardDetailService;
-        private readonly IUserService _userService;
+        private readonly ICardManagementService _cardService;
 
-        public CardDetailController(ICardDetailService cardDetailService, IUserService userService)
+        public CardDetailController(ICardManagementService cardService)
         {
-            _cardDetailService = cardDetailService;
-            _userService = userService;
+            _cardService = cardService;
         }
 
-        /// <summary>
-        /// Add a new card for the authenticated user.
-        /// </summary>
         [HttpPost("add")]
         public async Task<IActionResult> AddCard([FromBody] CardDetailDTO cardDetailDto)
         {
@@ -32,16 +27,41 @@ namespace UserApi.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("User ID not found in token.");
 
-            var response = await _cardDetailService.AddCardAsync(userId, cardDetailDto);
+            var response = await _cardService.AddCardAsync(userId, cardDetailDto);
             if (response.Success)
                 return Ok(new { message = response.Message, cardDetails = response.Data });
 
             return BadRequest(response.Message);
         }
 
-        /// <summary>
-        /// Retrieve all cards for the authenticated user.
-        /// </summary>
+        [HttpDelete("delete/{cardId}")]
+        public async Task<IActionResult> DeleteCard(int cardId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("User ID not found in token.");
+
+            var success = await _cardService.DeleteCardAsync(cardId, userId);
+            if (success)
+                return Ok(new { message = "Card deleted successfully." });
+
+            return NotFound("Card not found.");
+        }
+
+        [HttpPut("update/{cardId}")]
+        public async Task<IActionResult> UpdateCard(int cardId, [FromBody] CardDetailDTO cardDetailDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("User ID not found in token.");
+
+            var success = await _cardService.UpdateCardAsync(cardId, userId, cardDetailDto);
+            if (success)
+                return Ok(new { message = "Card updated successfully." });
+
+            return NotFound("Card not found.");
+        }
+
         [HttpGet("user-cards")]
         public async Task<IActionResult> GetUserCards()
         {
@@ -49,45 +69,8 @@ namespace UserApi.Controllers
             if (string.IsNullOrEmpty(userId))
                 return BadRequest("User ID not found in token.");
 
-            var response = await _cardDetailService.GetUserCardsAsync(userId);
-            if (response.Success)
-                return Ok(response.Data);
-
-            return BadRequest(response.Message);
-        }
-
-        /// <summary>
-        /// Delete a card by ID for the authenticated user.
-        /// </summary>
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteCard(int id)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return BadRequest("User ID not found in token.");
-
-            var response = await _cardDetailService.DeleteCardAsync(userId, id);
-            if (response.Success)
-                return Ok(new { message = response.Message });
-
-            return BadRequest(response.Message);
-        }
-
-        /// <summary>
-        /// Update card details for the authenticated user.
-        /// </summary>
-        [HttpPut("edit/{id}")]
-        public async Task<IActionResult> UpdateCard(int id, [FromBody] CardDetailDTO updatedCardDto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return BadRequest("User ID not found in token.");
-
-            var response = await _cardDetailService.UpdateCardAsync(userId, id, updatedCardDto);
-            if (response.Success)
-                return Ok(new { message = response.Message, card = response.Data });
-
-            return BadRequest(response.Message);
+            var cards = await _cardService.GetCardsByUserIdAsync(userId);
+            return Ok(cards);
         }
     }
 }

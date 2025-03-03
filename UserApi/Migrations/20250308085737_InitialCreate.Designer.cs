@@ -12,7 +12,7 @@ using UserApi.Data;
 namespace UserApi.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250301085855_InitialCreate")]
+    [Migration("20250308085737_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -568,6 +568,10 @@ namespace UserApi.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

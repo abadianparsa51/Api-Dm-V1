@@ -13,23 +13,15 @@ namespace UserApi.Data.Repositories
             _context = context;
         }
 
-        public async Task<Wallet> CreateWalletAsync(string userId)
+        public async Task CreateWalletAsync(Wallet wallet)
         {
-            var wallet = new Wallet
-            {
-                UserId = userId,
-                Balance = 0 // موجودی اولیه صفر
-            };
-
-            _context.Wallets.Add(wallet);
+            await _context.Wallets.AddAsync(wallet);
             await _context.SaveChangesAsync();
-            return wallet;
         }
 
         public async Task<Wallet> GetWalletByUserIdAsync(string userId)
         {
-            return await _context.Wallets
-                                 .FirstOrDefaultAsync(w => w.UserId == userId);
+            return await _context.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
         }
     }
 }

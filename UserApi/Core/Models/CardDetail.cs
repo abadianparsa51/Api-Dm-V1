@@ -27,8 +27,9 @@ namespace UserApi.Core.Models
         public int BankId { get; set; }
         public Bank Bank { get; set; }
 
-        [NotMapped]
-        public string BankName { get; set; }
+
+    [NotMapped]
+    public string BankName => Bank?.Name; // مقدار BankName را از Bank می‌گیریم
 
 
     }
