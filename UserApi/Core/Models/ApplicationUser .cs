@@ -8,5 +8,6 @@ namespace UserApi.Core.Models
                                                            // اضافه کردن ارتباط یک کاربر با چند Contact
         public ICollection<Contact> Contacts { get; set; }
         public Wallet Wallet { get; set; } // ارتباط یک به یک با کیف پول
+        public string WalletId => Wallet?.Id;  // اضافه کردن WalletId به عنوان ویژگی محاسباتی
     }
 }
