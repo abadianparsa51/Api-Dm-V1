@@ -16,6 +16,21 @@ namespace UserApi.Data
         public DbSet<Wallet> Wallets { get; set; }
         
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Brand> Brands => Set<Brand>();
+        public DbSet<Unit> Units => Set<Unit>();
+        public DbSet<Supplier> Suppliers => Set<Supplier>();
+        public DbSet<Store> Stores => Set<Store>();
+
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<ProductBarcode> ProductBarcodes => Set<ProductBarcode>();
+
+        public DbSet<PriceList> PriceLists => Set<PriceList>();
+        public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
+        public DbSet<PriceChangeLog> PriceChangeLogs => Set<PriceChangeLog>();
+
+        public DbSet<InventoryLot> InventoryLots => Set<InventoryLot>();
+
         //public DbSet<JobRequest> JobRequests { get; set; }
         //public DbSet<NotificationRequest> NotificationRequests { get; set; }
 
@@ -89,7 +104,207 @@ namespace UserApi.Data
           );
 
             // تنظیمات بیشتر برای TransactionLog
+            // =======================
+            // Luxury Market Mapping
+            // =======================
 
+            // Category self-reference
+            modelBuilder.Entity<Category>(b =>
+            {
+                b.ToTable("Categories");
+                b.HasKey(x => x.CategoryId);
+
+                b.Property(x => x.Name).HasMaxLength(150).IsRequired();
+
+                b.HasOne(x => x.ParentCategory)
+                 .WithMany(x => x.Children)
+                 .HasForeignKey(x => x.ParentCategoryId)
+                 .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Brand>(b =>
+            {
+                b.ToTable("Brands");
+                b.HasKey(x => x.BrandId);
+
+                b.Property(x => x.Name).HasMaxLength(150).IsRequired();
+                b.HasIndex(x => x.Name).IsUnique();
+
+                b.Property(x => x.Country).HasMaxLength(80);
+                b.Property(x => x.IsPremium).HasDefaultValue(true);
+            });
+
+            modelBuilder.Entity<Unit>(b =>
+            {
+                b.ToTable("Units");
+                b.HasKey(x => x.UnitId);
+
+                b.Property(x => x.Name).HasMaxLength(50).IsRequired();
+                b.Property(x => x.Symbol).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<Supplier>(b =>
+            {
+                b.ToTable("Suppliers");
+                b.HasKey(x => x.SupplierId);
+
+                b.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                b.Property(x => x.Phone).HasMaxLength(30);
+                b.Property(x => x.City).HasMaxLength(80).HasDefaultValue("Tehran");
+                b.Property(x => x.Address).HasMaxLength(400);
+
+                b.Property(x => x.IsImporter).HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<Store>(b =>
+            {
+                b.ToTable("Stores");
+                b.HasKey(x => x.StoreId);
+
+                b.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                b.Property(x => x.Area).HasMaxLength(120);
+                b.Property(x => x.Address).HasMaxLength(400);
+            });
+
+            modelBuilder.Entity<Product>(b =>
+            {
+                b.ToTable("Products");
+                b.HasKey(x => x.ProductId);
+
+                b.Property(x => x.SKU).HasMaxLength(40).IsRequired();
+                b.HasIndex(x => x.SKU).IsUnique();
+
+                b.Property(x => x.NameFa).HasMaxLength(250).IsRequired();
+                b.Property(x => x.NameEn).HasMaxLength(250);
+
+                b.Property(x => x.NetWeightValue).HasPrecision(12, 3);
+                b.Property(x => x.NetWeightUnit).HasMaxLength(20);
+
+                b.Property(x => x.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                b.Property(x => x.IsActive).HasDefaultValue(true);
+
+                b.HasOne(x => x.Category)
+                 .WithMany(c => c.Products)
+                 .HasForeignKey(x => x.CategoryId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Brand)
+                 .WithMany(br => br.Products)
+                 .HasForeignKey(x => x.BrandId)
+                 .OnDelete(DeleteBehavior.SetNull);
+
+                b.HasOne(x => x.Unit)
+                 .WithMany(u => u.Products)
+                 .HasForeignKey(x => x.UnitId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ProductBarcode>(b =>
+            {
+                b.ToTable("ProductBarcodes");
+                b.HasKey(x => x.BarcodeId);
+
+                b.Property(x => x.Barcode).HasMaxLength(30).IsRequired();
+                b.Property(x => x.BarcodeType).HasMaxLength(10).IsRequired();
+                b.Property(x => x.IsPrimary).HasDefaultValue(false);
+
+                b.HasIndex(x => new { x.ProductId, x.Barcode }).IsUnique();
+
+                b.HasOne(x => x.Product)
+                 .WithMany(p => p.Barcodes)
+                 .HasForeignKey(x => x.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<PriceList>(b =>
+            {
+                b.ToTable("PriceLists");
+                b.HasKey(x => x.PriceListId);
+
+                b.Property(x => x.Name).HasMaxLength(120).IsRequired();
+                b.Property(x => x.Currency).HasMaxLength(10).HasDefaultValue("IRR");
+                b.Property(x => x.IsActive).HasDefaultValue(true);
+            });
+
+            modelBuilder.Entity<ProductPrice>(b =>
+            {
+                b.ToTable("ProductPrices");
+                b.HasKey(x => x.ProductPriceId);
+
+                b.Property(x => x.PriceIRR).IsRequired();
+                b.Property(x => x.ValidFrom).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => new { x.PriceListId, x.ProductId, x.ValidFrom }).IsUnique();
+
+                b.HasOne(x => x.PriceList)
+                 .WithMany(x => x.ProductPrices)
+                 .HasForeignKey(x => x.PriceListId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Product)
+                 .WithMany(x => x.Prices)
+                 .HasForeignKey(x => x.ProductId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<PriceChangeLog>(b =>
+            {
+                b.ToTable("PriceChangeLog");
+                b.HasKey(x => x.LogId);
+
+                b.Property(x => x.ChangedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                b.Property(x => x.ChangedBy).HasMaxLength(120);
+                b.Property(x => x.Reason).HasMaxLength(300);
+
+                b.HasOne(x => x.Product)
+                 .WithMany()
+                 .HasForeignKey(x => x.ProductId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.PriceList)
+                 .WithMany()
+                 .HasForeignKey(x => x.PriceListId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<InventoryLot>(b =>
+            {
+                b.ToTable("InventoryLots");
+
+                // ✅ این خط مشکل اصلی تو را حل می‌کند
+                b.HasKey(x => x.LotId);
+
+                b.Property(x => x.QtyOnHand).HasPrecision(18, 3);
+                b.Property(x => x.ReceivedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                b.Property(x => x.LotNumber).HasMaxLength(60);
+
+                // DateOnly -> SQL type date
+                b.Property(x => x.ExpireDate).HasColumnType("date");
+
+                b.HasOne(x => x.Store)
+                 .WithMany(s => s.InventoryLots)
+                 .HasForeignKey(x => x.StoreId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Product)
+                 .WithMany(p => p.InventoryLots)
+                 .HasForeignKey(x => x.ProductId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.Supplier)
+                 .WithMany(su => su.InventoryLots)
+                 .HasForeignKey(x => x.SupplierId)
+                 .OnDelete(DeleteBehavior.SetNull);
+
+                b.HasIndex(x => x.ExpireDate).HasDatabaseName("IX_InventoryLots_ExpireDate");
+            });
+            modelBuilder.Entity<Fee>()
+            .Property(x => x.FeeAmount)
+            .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Wallet>()
+                .Property(x => x.Balance)
+                .HasPrecision(18, 2);
 
         }
 

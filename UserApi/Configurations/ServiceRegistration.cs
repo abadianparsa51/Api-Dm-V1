@@ -44,6 +44,9 @@ namespace UserApi.Configuration
             services.AddScoped<IOtpService, OtpService>();
             services.AddSingleton<IJwtHelper, JwtHelper>();
 
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductService, ProductService>();
+
             // Register AutoMapper Profile
             services.AddAutoMapper(typeof(ContactProfile));
 
