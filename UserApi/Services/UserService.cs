@@ -58,7 +58,8 @@ public class UserService : IUserService
         if (user == null || !await _userRepository.CheckPasswordAsync(user, loginDto.Password))
             return new AuthResult { Result = false, Errors = new List<string> { "Invalid credentials." } };
 
-        var token = _jwtHelper.GenerateJwtToken(user);
+        var roles = await _userRepository.GetRolesAsync(user);
+        var token = _jwtHelper.GenerateJwtToken(user, roles);
 
         var wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
         var walletId = wallet?.Id;
@@ -85,9 +86,9 @@ public class UserService : IUserService
         return _jwtHelper.GenerateJwtToken(user);
     }
 
-    public async Task<string> GenerateOtpAsync(string phoneNumber ,string userId)
+    public async Task<string> GenerateOtpAsync(string phoneNumber, string userId)
     {
-        return await _otpService.GenerateOtpAsync(phoneNumber,userId);
+        return await _otpService.GenerateOtpAsync(phoneNumber, userId);
     }
     public async Task<AuthResult> VerifyOtpAsync(string phoneNumber, string otp)
     {

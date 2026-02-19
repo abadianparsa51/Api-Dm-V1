@@ -1,10 +1,13 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UserApi.Configuration;
+using UserApi.Core.Models;
+using UserApi.Data;
 using UserApi.Helper;
 
 namespace UserApi
@@ -49,12 +52,29 @@ namespace UserApi
 
             // Enable Hangfire Dashboard
             app.UseHangfireDashboard("/hangfire");
-           
+
+            IdentitySeeder.SeedAsync(app.ApplicationServices).GetAwaiter().GetResult();
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var user = userManager.FindByEmailAsync("ParsaT73@routine.com").GetAwaiter().GetResult();
+
+                if (user != null)
+                {
+                    var token = userManager.GeneratePasswordResetTokenAsync(user).GetAwaiter().GetResult();
+                    var result = userManager.ResetPasswordAsync(user, token, "Admin@123456").GetAwaiter().GetResult();
+
+                    // اگر قبلاً پسورد داشته و Reset fail شد، لاگ بگیر (اختیاری)
+                    // مثلا Debug.WriteLine(string.Join(",", result.Errors.Select(e => e.Description)));
+                }
+            }
+
             // Middleware Pipeline
             app.UseRouting();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors();
+           
 
             app.UseEndpoints(endpoints =>
             {
@@ -62,5 +82,6 @@ namespace UserApi
                 endpoints.MapControllers();
             });
         }
+
     }
 }
