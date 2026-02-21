@@ -6,4 +6,5 @@ public interface IUserRepository
     Task<ApplicationUser> GetUserByPhoneAsync(string phoneNumber);
     Task<bool> CreateUserAsync(ApplicationUser user, string password);
     Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
+    Task<IList<string>> GetRolesAsync(ApplicationUser user);
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -8,7 +9,7 @@ namespace UserApi.Helpers
 {
     public interface IJwtHelper
     {
-        string GenerateJwtToken(ApplicationUser user);
+        string GenerateJwtToken(ApplicationUser user, IEnumerable<string>? roles = null);
         string GetUserIdFromToken(string token);
         ClaimsPrincipal ValidateToken(string token); // اضافه کردن متد جدید
     }
@@ -70,7 +71,7 @@ namespace UserApi.Helpers
         }
 
 
-        public string GenerateJwtToken(ApplicationUser user)
+        public string GenerateJwtToken(ApplicationUser user, IEnumerable<string>? roles = null)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
@@ -80,6 +81,15 @@ namespace UserApi.Helpers
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) // ذخیره کردن User ID در توکن
             };
+
+            // نقش‌ها برای Authorize(Roles=...) لازم است
+            if (roles != null)
+            {
+                foreach (var r in roles.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, r));
+                }
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
