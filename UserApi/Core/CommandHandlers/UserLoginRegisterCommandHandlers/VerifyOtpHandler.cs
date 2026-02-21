@@ -8,13 +8,15 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, AuthResult>
 {
     private readonly IUserService _userService;
     private readonly IJwtHelper _jwtHelper;
+    private readonly IUserRepository _userRepository;
     private readonly IWalletRepository _walletRepository;
 
-    public VerifyOtpHandler(IUserService userService, IJwtHelper jwtHelper, IWalletRepository walletRepository)
+    public VerifyOtpHandler(IUserService userService, IJwtHelper jwtHelper, IWalletRepository walletRepository, IUserRepository userRepository)
     {
         _userService = userService;
         _jwtHelper = jwtHelper;
         _walletRepository = walletRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<AuthResult> Handle(VerifyOtpCommand request, CancellationToken cancellationToken)
@@ -35,7 +37,8 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, AuthResult>
         }
 
         // Generate JWT token
-        var token = _jwtHelper.GenerateJwtToken(user);
+        var roles = await _userRepository.GetRolesAsync(user);
+        var token = _jwtHelper.GenerateJwtToken(user, roles);
         var wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
         var walletId = wallet?.Id;
         var walletBalance = wallet?.Balance ?? 0;

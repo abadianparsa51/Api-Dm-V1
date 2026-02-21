@@ -8,5 +8,6 @@ namespace UserApi.Core.Repositories
     {
         Task<bool> SkuExistsAsync(string sku, CancellationToken ct = default);
         Task<Product> CreateProductGraphAsync(Product product, CancellationToken ct = default);
+
     }
 }

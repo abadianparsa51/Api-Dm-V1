@@ -38,4 +38,6 @@ public class UserRepository : IUserRepository
         // بررسی رمز عبور با UserManager
         return await _userManager.CheckPasswordAsync(user, password);
     }
+    public Task<IList<string>> GetRolesAsync(ApplicationUser user)
+    => _userManager.GetRolesAsync(user);
 }
