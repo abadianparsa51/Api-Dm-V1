@@ -6,6 +6,6 @@ namespace UserApi.Core.Models.DTOs
     {
         [Required]
         [MinLength(6)]
-        public string CardNumber { get; set; } = string.Empty;
+        public string Prefix { get; set; } = string.Empty;
     }
 }
